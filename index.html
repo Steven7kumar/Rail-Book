@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Rail Book — Competition Prototype v2.2</title>
+<style>
+:root{--green:#285C45;--deep:#1F4937;--cream:#F3F4E9;--chat:#F3F4E9;--ink:#202820;--muted:#65716A;--line:#D9DED3;--white:#fff;--orange:#E99535;--yellow:#FFF1CC;--red:#F8DDDA;--pale:#DDF1DE}
+*{box-sizing:border-box}body{margin:0;background:#e6e9e2;color:var(--ink);font-family:Inter,Arial,sans-serif;min-height:100vh;display:grid;place-items:center;padding:12px}
+.app{width:min(100%,430px);height:min(940px,calc(100vh - 24px));min-height:720px;background:var(--chat);border-radius:26px;box-shadow:0 18px 55px #17251d30;overflow:hidden;display:flex;flex-direction:column}
+header{height:72px;background:var(--green);display:flex;align-items:center;padding:0 15px;gap:10px;flex:none}
+.logo{width:42px;height:42px;background:#fff;color:var(--green);border-radius:14px;display:grid;place-items:center;font-size:22px}
+.brand{font-size:18px;font-weight:850;color:#fff}.tag{font-size:10px;color:#E4EDE5;margin-top:2px}.help{margin-left:auto;border:1px solid #ffffff80;background:#ffffff14;color:#fff;border-radius:10px;padding:8px 10px;font-weight:700}
+.progress{height:4px;background:#d7ded4;flex:none}.progress>div{height:100%;background:var(--green);width:16.66%;transition:width .2s}
+.nav{display:flex;gap:5px;padding:8px 9px;background:#fff;overflow:auto;flex:none}
+.nav button{white-space:nowrap;border:1px solid var(--line);border-radius:9px;padding:7px 9px;background:#fff;color:#506055;font-size:10px;font-weight:700}
+.nav button.active{background:var(--orange);border-color:var(--orange);color:#202820}
+main{padding:13px;overflow:auto;display:flex;flex-direction:column;gap:11px;flex:1}
+.bubble{background:#fff;border:1px solid #E1E4DA;border-radius:15px;padding:13px;box-shadow:0 2px 7px #25372a0a}
+h1{font-size:20px;line-height:1.2;margin:0 0 6px}h2{font-size:15px;margin:0 0 9px}.sub{font-size:12px;line-height:1.45;color:var(--muted);margin:0}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:9px}.field label{display:block;font-size:10px;font-weight:800;color:#526057;margin-bottom:5px}
+input,select{width:100%;height:43px;border:1.4px solid var(--line);border-radius:10px;padding:0 10px;background:#fff;color:var(--ink);font-size:14px;min-width:0}
+input:focus,select:focus{outline:3px solid #285c4520;border-color:var(--green)}
+.btn{border:0;border-radius:12px;min-height:49px;padding:10px 13px;background:var(--green);color:#fff;font-size:14px;font-weight:800;cursor:pointer}
+.btn.secondary{background:#fff;color:var(--green);border:1.4px solid var(--green)}
+.btn:disabled{opacity:.55;cursor:not-allowed}
+.btnrow{display:flex;gap:8px}.btnrow .btn{flex:1}
+.warn{background:var(--yellow);color:#684B12;padding:10px;border-radius:10px;font-size:11px;line-height:1.4}
+.train{border:2px solid var(--line);border-radius:13px;padding:11px;background:#fff}
+.train.selected{outline:3px solid var(--green);outline-offset:1px}
+.train.available{background:#E2F2E3;border-color:#8FBC98}.train.rac{background:#E5F0D9;border-color:#A7C48F}.train.wl1{background:#FFF0B8;border-color:#E1C16A}.train.wl2{background:#F8DDDA;border-color:#E1A39B}.train.wl3{background:#EFC5C1;border-color:#D88D86}
+.trainhead{display:flex;justify-content:space-between;gap:8px;font-size:13px;font-weight:800}.trainmeta{font-size:10px;color:#5c695f;margin-top:3px}.times{font-size:12px;margin:9px 0;border-top:1px solid #00000015;border-bottom:1px solid #00000015;padding:8px 0;display:flex;justify-content:space-between;gap:8px}.status{font-size:11px;font-weight:800;line-height:1.4}.price{font-size:12px;font-weight:800}
+.pill{display:inline-block;background:#fff;border-radius:7px;padding:5px 8px;font-size:11px;font-weight:800;color:var(--green)}
+.summaryline{display:flex;justify-content:space-between;gap:10px;border-bottom:1px solid #edf0ea;padding:7px 0;font-size:12px}.summaryline span{color:var(--muted)}.summaryline b{text-align:right}
+.total{display:flex;justify-content:space-between;align-items:center;padding-top:10px;font-size:14px;font-weight:800}.total strong{font-size:20px;color:var(--green)}
+.passenger{border:1px solid var(--line);border-radius:11px;padding:11px;margin-bottom:9px}
+.method{display:flex;align-items:center;gap:9px;border:1px solid var(--line);border-radius:10px;padding:10px;margin-top:7px;font-size:12px;font-weight:700;background:#fff}.method input{width:17px;height:17px;accent-color:var(--green)}
+.state{padding:12px;border-radius:11px;font-size:12px;line-height:1.45}.processing{background:var(--yellow);color:#684B12}.failed{background:var(--red);color:#8b2727}.confirmed{background:var(--pale);color:var(--green)}
+.ticket{border:1.5px solid #8FBC98;background:#F7FFF6;border-radius:13px;padding:13px}
+.footer{background:#f8f8f5;padding:9px 12px;display:flex;align-items:center;gap:9px;flex:none}
+.footer .msg{flex:1;border:1px solid var(--line);border-radius:22px;background:#fff;color:#788078;padding:10px 13px;font-size:12px}
+.footer button{border:0;background:transparent;font-size:19px;color:var(--green)}
+.small{font-size:10px;color:var(--muted);line-height:1.4}
+.hidden{display:none!important}
+.modal-backdrop{position:fixed;inset:0;background:#10221999;display:grid;place-items:center;padding:18px;z-index:20}
+.modal{width:min(100%,390px);background:#fff;border-radius:18px;padding:19px;box-shadow:0 20px 60px #0004}
+.modal h2{font-size:18px;margin:0 0 8px}.modal p{font-size:12px;color:var(--muted);line-height:1.5}
+.modal .reviewline{padding:9px 0;border-bottom:1px solid var(--line);font-size:13px;display:flex;justify-content:space-between;gap:12px}
+.modal .reviewline span{color:var(--muted)}
+@media(max-height:780px){.app{height:calc(100vh - 12px);min-height:0}.nav{padding:5px}.app main{padding:9px;gap:8px}}
+</style></head>
+<body>
+<div class="app">
+<header><div class="logo">🚆</div><div><div class="brand">Rail Book</div><div class="tag">Your Journey, Made Simple.</div></div><button class="help" onclick="help()">? Help</button></header>
+<div class="progress"><div id="progress"></div></div>
+<nav class="nav" id="nav"></nav>
+<main id="screen" aria-live="polite"></main>
+<footer class="footer"><button aria-label="Help" onclick="help()">ⓘ Help</button><button class="share" aria-label="Share journey details" onclick="shareJourney()">↗ Share</button></footer>
+</div>
+<div id="modalRoot"></div>
+<script>
+const steps=['Search','Trains','Summary','Passengers','Payment','My Journey'];
+let page=0, selectedTrain=0, passengerCount=1, passengers=[{name:'',age:'',gender:'',berth:'No preference'}], payment='UPI', paymentState='idle', language='English', familyConsent=false;
+const trains=[
+ {name:'Prashanti Express',no:'18463',depart:'06:15',arrive:'11:25',duration:'5h 10m',status:'AVAILABLE · 22 SEATS',type:'available',fare:245,code:'SL'},
+ {name:'Hampi Express',no:'16592',depart:'21:05',arrive:'03:05',duration:'6h 00m',status:'WAITLIST · WL 7',type:'wl1',fare:230,code:'SL'},
+ {name:'Intercity Express',no:'22617',depart:'14:40',arrive:'20:15',duration:'5h 35m',status:'WAITLIST · WL 18',type:'wl2',fare:255,code:'SL'}
+];
+const $=id=>document.getElementById(id);
+function nav(){ $('nav').innerHTML=steps.map((s,i)=>`<button class="${page===i?'active':''}" onclick="go(${i})">${String(i+1).padStart(2,'0')} ${s}</button>`).join('');$('progress').style.width=((page+1)/6*100)+'%';}
+function go(n){page=Math.max(0,Math.min(5,n));nav();render();$('screen').scrollTop=0;}
+function fare(){return trains[selectedTrain].fare*passengerCount;}
+function render(){
+ const root=$('screen');
+ if(page===0) root.innerHTML=`
+ <div class="bubble"><h1>Where would you like to go?</h1><p class="sub">Hello! Let's plan your train journey. You can type your stations or use voice assistance.</p></div>
+ <div class="bubble"><div class="field"><label>LANGUAGE / భాష / மொழி / भाषा</label><select id="lang" onchange="language=this.value"><option ${language==='English'?'selected':''}>English</option><option ${language==='తెలుగు'?'selected':''}>తెలుగు</option><option ${language==='தமிழ்'?'selected':''}>தமிழ்</option><option ${language==='हिन्दी'?'selected':''}>हिन्दी</option></select></div><div class="field" style="margin-top:10px"><label>FROM — BOARDING STATION</label><input id="from" value="Anantapur" placeholder="City or station"></div><div class="field" style="margin-top:10px"><label>TO — DESTINATION</label><input id="to" value="Bengaluru" placeholder="Where are you going?"></div><div class="row" style="margin-top:10px"><div class="field"><label>JOURNEY DATE</label><input id="date" type="date" value="2026-12-18"></div><div class="field"><label>PASSENGERS</label><select id="count" onchange="setCount(+this.value)">${[1,2,3,4,5,6].map(n=>`<option value="${n}" ${n===passengerCount?'selected':''}>${n}</option>`).join('')}</select></div></div></div>
+ <div class="warn">⚠ Please check your destination carefully. If you only know the city, select the correct station from the suggestions.</div><button class="btn" onclick="search()">Find My Train →</button>`;
+ if(page===1) root.innerHTML=`
+ <div class="bubble"><h1>Available trains</h1><p class="sub">${esc(state.from)} → ${esc(state.to)} · ${esc(state.date)} · ${passengerCount} passenger(s)</p><p class="sub" style="margin-top:5px">Selected travel class: <b>Sleeper (SL)</b></p></div>
+ <div class="small">Choose one train. Availability colours always include a written status.</div>
+ ${trains.map((t,i)=>`<div class="train ${t.type} ${selectedTrain===i?'selected':''}"><div class="trainhead"><span>${t.no} ${t.name}</span><span class="price">₹${t.fare}</span></div><div class="trainmeta">Daily service · Sleeper (SL)</div><div class="times"><b>${t.depart} · ${esc(state.from)}</b><span>${t.duration}</span><b>${t.arrive} · ${esc(state.to)}</b></div><div class="status">${t.status}</div><button class="btn secondary" style="width:100%;margin-top:9px" onclick="selectTrain(${i})">${selectedTrain===i?'✓ Selected':'Select this train'}</button></div>`).join('')}
+ <div class="warn">Availability is sample prototype data, not live railway information. WL status does not guarantee confirmation.</div><button class="btn" onclick="go(2)">Continue with selected train →</button>`;
+ if(page===2) root.innerHTML=`
+ <div class="bubble"><h1>Review your journey</h1><p class="sub">Please check the train and fare before adding passenger details.</p></div>
+ <div class="bubble"><h2>${trains[selectedTrain].no} ${trains[selectedTrain].name}</h2><div class="summaryline"><span>Route</span><b>${esc(state.from)} → ${esc(state.to)}</b></div><div class="summaryline"><span>Date</span><b>${esc(state.date)}</b></div><div class="summaryline"><span>Departure / Arrival</span><b>${trains[selectedTrain].depart} → ${trains[selectedTrain].arrive}</b></div><div class="summaryline"><span>Class</span><b>Sleeper (SL)</b></div><div class="summaryline"><span>Availability</span><b>${trains[selectedTrain].status}</b></div><div class="summaryline"><span>Passengers</span><b>${passengerCount}</b></div><div class="total"><span>Estimated total</span><strong>₹${fare()}</strong></div></div>
+ <div class="warn">Fare is illustrative sample data. Final fare and availability must be verified before a real booking.</div><button class="btn" onclick="syncPassengers();go(3)">Confirm journey details →</button>`;
+ if(page===3) root.innerHTML=`
+ <div class="bubble"><h1>Passenger details</h1><p class="sub">Type each passenger's name and age. Review spelling before confirming.</p></div>
+ ${passengers.map((p,i)=>`<div class="bubble"><h2>Passenger ${i+1}</h2><div class="field"><label>FULL NAME</label><input data-p="${i}" data-k="name" value="${attr(p.name)}" placeholder="Name as on ID"></div><div class="row" style="margin-top:9px"><div class="field"><label>AGE</label><input data-p="${i}" data-k="age" type="number" min="1" max="120" value="${attr(p.age)}" placeholder="Age"></div><div class="field"><label>GENDER</label><select data-p="${i}" data-k="gender"><option value="">Select</option>${['Female','Male','Other'].map(g=>`<option ${p.gender===g?'selected':''}>${g}</option>`).join('')}</select></div></div><div class="field" style="margin-top:9px"><label>BERTH PREFERENCE</label><select data-p="${i}" data-k="berth">${['No preference','Lower','Middle','Upper','Side Lower','Side Upper'].map(g=>`<option ${p.berth===g?'selected':''}>${g}</option>`).join('')}</select></div></div>`).join('')}
+ <div class="btnrow"><button class="btn secondary" onclick="addPassenger()" ${passengerCount>=6?'disabled':''}>＋ Add passenger</button><button class="btn" onclick="reviewPassengers()">Review details →</button></div><div id="passengerNotice" class="small"></div>`;
+ if(page===4) root.innerHTML=`
+ <div class="bubble"><h1>Review & payment</h1><p class="sub">Check your booking summary and choose a payment method.</p></div>
+ <div class="bubble"><div class="summaryline"><span>Train</span><b>${trains[selectedTrain].no} ${trains[selectedTrain].name}</b></div><div class="summaryline"><span>Journey</span><b>${esc(state.from)} → ${esc(state.to)}</b></div><div class="summaryline"><span>Date / Class</span><b>${esc(state.date)} · SL</b></div><div class="summaryline"><span>Passengers</span><b>${passengerCount}</b></div><div class="total"><span>Total amount</span><strong>₹${fare()}</strong></div></div>
+ <div class="bubble"><h2>Choose payment method</h2>${['UPI','Debit / Credit Card','Net Banking'].map((m,i)=>`<label class="method"><input type="radio" name="pay" value="${m}" ${payment===m?'checked':''} onchange="payment=this.value"><span>${m}</span></label>`).join('')}</div>
+ <div class="warn">Confirm the details before paying. If payment is processing, do not pay again. This prototype does not collect payment details.</div>
+ ${paymentState==='idle'?'<button class="btn" onclick="startPayment()">Confirm & Pay ₹'+fare()+'</button>':''}
+ ${paymentState==='processing'?'<div class="state processing">⏳ STOP — Your payment is being processed. Please do not pay again.</div><button class="btn secondary" onclick="resolvePayment()">Simulate payment result</button>':''}
+ ${paymentState==='failed'?'<div class="state failed">✕ Payment failed in this demo. Check transaction status before attempting another payment.</div><button class="btn secondary" onclick="resetPayment()">Try again (demo)</button>':''}
+ ${paymentState==='confirmed'?'<div class="state confirmed">✓ Payment successful in this demo. Continue to the ticket preview.</div><button class="btn" onclick="go(5)">View ticket →</button>':''}`;
+ if(page===5) root.innerHTML=`
+ <div class="bubble"><h1>My Journey</h1><p class="sub">Your ticket preview and journey preferences.</p></div>
+ <div class="state ${paymentState==='confirmed'?'confirmed':'processing'}">${paymentState==='confirmed'?'✓ Demo payment confirmed':'ℹ Demo ticket preview — no real ticket has been issued'}</div>
+ <div class="ticket"><div style="display:flex;justify-content:space-between;gap:8px"><b>🎫 Journey ticket preview</b><span class="pill">${paymentState==='confirmed'?'DEMO PAID':'PREVIEW ONLY'}</span></div><h2 style="margin-top:12px">${trains[selectedTrain].no} ${trains[selectedTrain].name}</h2><div class="times"><b>${trains[selectedTrain].depart}<br>${esc(state.from)}</b><span>→</span><b>${trains[selectedTrain].arrive}<br>${esc(state.to)}</b></div><div class="summaryline"><span>Date</span><b>${esc(state.date)}</b></div><div class="summaryline"><span>Class</span><b>Sleeper (SL)</b></div><div class="summaryline"><span>Passengers</span><b>${passengers.map(p=>esc(p.name)).join(', ')}</b></div><div class="summaryline"><span>Demo fare</span><b>₹${fare()}</b></div><p class="small">No real PNR, seat allocation or booking has been generated.</p></div>
+ <div class="bubble"><h2>Journey reminder</h2><label class="method"><input type="checkbox" checked> Remind me 3 days before travel</label><label class="method"><input type="checkbox"> Add reminder to calendar</label><label class="method"><input type="checkbox"> SMS / WhatsApp reminder preference</label></div>
+ <div class="bubble"><h2>Family Assist</h2><label class="method"><input type="checkbox" ${familyConsent?'checked':''} onchange="familyConsent=this.checked"> I give permission to share journey details with family.</label><p class="small">Sharing is optional and requires your consent.</p></div>
+ <button class="btn secondary" onclick="resetAll()">Start a new search</button>`;
+}
+let state={from:'Anantapur',to:'Bengaluru',date:'2026-12-18'};
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function attr(s){return esc(s).replace(/"/g,'&quot;')}
+function search(){state.from=$('from').value.trim();state.to=$('to').value.trim();state.date=$('date').value;if(!state.from||!state.to||!state.date){alert('Enter from, destination and journey date.');return}if(state.from.toLowerCase()===state.to.toLowerCase()){alert('From and destination cannot be the same.');return}go(1)}
+function selectTrain(i){selectedTrain=i;render()}
+function setCount(n){passengerCount=Math.max(1,Math.min(6,n));syncPassengers()}
+function syncPassengers(){passengers=Array.from({length:passengerCount},(_,i)=>passengers[i]||{name:'',age:'',gender:'',berth:'No preference'})}
+function addPassenger(){readPassengerFields();if(passengerCount<6){passengerCount++;syncPassengers();render()}}
+function readPassengerFields(){document.querySelectorAll('[data-p]').forEach(el=>{let i=+el.dataset.p,k=el.dataset.k;if(passengers[i])passengers[i][k]=el.value})}
+function reviewPassengers(){readPassengerFields();let invalid=passengers.findIndex(p=>!p.name.trim()||!p.age||+p.age<1||+p.age>120||!p.gender);let n=$('passengerNotice');if(invalid>=0){n.textContent='Please complete a valid name, age and gender for Passenger '+(invalid+1)+'.';n.style.color='#a02d2d';return}let lines=passengers.map((p,i)=>`<div class=\"reviewline\"><span>Passenger ${i+1}</span><b>${esc(p.name)} · ${esc(p.age)} · ${esc(p.gender)}</b></div>`).join('');$('modalRoot').innerHTML=`<div class=\"modal-backdrop\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"reviewTitle\"><div class=\"modal\"><h2 id=\"reviewTitle\">Please review passenger details</h2><p>Check names and details carefully before continuing. You can go back and edit anything.</p>${lines}<div class=\"btnrow\" style=\"margin-top:16px\"><button class=\"btn secondary\" onclick=\"closeReview()\">Edit details</button><button class=\"btn\" onclick=\"confirmPassengers()\">Confirm</button></div></div></div>`}
+function closeReview(){$('modalRoot').innerHTML=''}
+function confirmPassengers(){closeReview();paymentState='idle';go(4)}
+function startPayment(){paymentState='processing';render()}
+function resolvePayment(){if(confirm('Simulate a successful payment? Choose Cancel to show a failed payment.'))paymentState='confirmed';else paymentState='failed';render()}
+function resetPayment(){paymentState='idle';render()}
+function resetAll(){page=0;selectedTrain=0;passengerCount=1;passengers=[{name:'',age:'',gender:'',berth:'No preference'}];paymentState='idle';familyConsent=false;state={from:'Anantapur',to:'Bengaluru',date:'2026-12-18'};go(0)}
+
+async function shareJourney(){
+ const details=`Rail Book — Journey details\n${state.from} to ${state.to}\nDate: ${state.date}\nTrain: ${trains[selectedTrain].no} ${trains[selectedTrain].name}\nClass: Sleeper (SL)\nPassengers: ${passengerCount}\n\nShared by the passenger from the Rail Book prototype.`;
+ try{
+  if(navigator.share){await navigator.share({title:'My Rail Book journey',text:details});return;}
+  if(navigator.clipboard && window.isSecureContext){await navigator.clipboard.writeText(details);alert('Journey details copied. You can paste and share them with your family.');return;}
+  window.prompt('Copy these journey details and share them:',details);
+ }catch(e){if(e.name!=='AbortError')alert('Sharing is unavailable here. You can still share the journey details manually.');}
+}
+function help(){alert('Rail Book Help\\n\\nUse the numbered steps to move through the demo. Ask a family member for help if needed. Your journey details are shared only when you choose Share. This is a prototype, not a live railway service.')}
+function voiceHelp(){alert('Voice assistance preview: voice recognition is not connected in this prototype. You can type your journey details.')}
+nav();render();
+</script></body></html>
